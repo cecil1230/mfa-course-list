@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MFA 课程清单 · AI创新中本贯通项目</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=Noto+Serif+SC:wght@300;400;500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a1f3d;
+    --ink-rgb:10,31,61;
+    --paper:#f1f3f5;
+    --paper-rgb:241,243,245;
+    --paper-tint:#e4e8ec;
+    --ink-tint:#152a4a;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --serif-en:"Playfair Display","Source Serif 4",Georgia,serif;
+    --serif-body-en:"Source Serif 4",Georgia,serif;
+    --serif-zh:"Noto Serif SC",source-han-serif-sc,serif;
+    --sans-zh:"Noto Sans SC",source-han-sans-sc,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--paper);font-family:var(--sans-zh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  canvas.bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;transition:opacity 1.2s ease}
+  canvas#bg-light{opacity:0}
+  canvas#bg-dark{opacity:1}
+  body.light-bg canvas#bg-light{opacity:1}
+  body.light-bg canvas#bg-dark{opacity:0}
+  body.low-power canvas.bg{display:none!important}
+  #deck{position:fixed;inset:0;width:10000vw;height:100vh;display:flex;flex-wrap:nowrap;transition:transform .9s cubic-bezier(.77,0,.175,1);z-index:10;will-change:transform}
+  .slide{width:100vw;height:100vh;flex:0 0 100vw;position:relative;padding:6vh 6vw 10vh 6vw;display:flex;flex-direction:column;overflow:hidden}
+  .slide.light{color:var(--ink);background:var(--paper)}
+  .slide.dark{color:var(--paper);background:var(--ink)}
+  .slide::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;transition:background .7s ease}
+  .slide.light::before{background:rgba(var(--paper-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.dark::before{background:rgba(var(--ink-rgb),.78);backdrop-filter:blur(3px)}
+  .slide.hero.light::before{background:rgba(var(--paper-rgb),.16);backdrop-filter:none}
+  .slide.hero.dark::before{background:rgba(var(--ink-rgb),.12);backdrop-filter:none}
+  .slide.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+  .slide.hero.light::after{background:linear-gradient(180deg,rgba(var(--paper-rgb),.28) 0%,rgba(var(--paper-rgb),0) 14%,rgba(var(--paper-rgb),0) 86%,rgba(var(--paper-rgb),.28) 100%)}
+  .slide.hero.dark::after{background:linear-gradient(180deg,rgba(var(--ink-rgb),.32) 0%,rgba(var(--ink-rgb),0) 14%,rgba(var(--ink-rgb),0) 86%,rgba(var(--ink-rgb),.32) 100%)}
+  .chrome{display:flex;justify-content:space-between;align-items:flex-start;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.55}
+  .foot .title{font-family:var(--serif-zh);font-weight:400;letter-spacing:.05em;text-transform:none;opacity:.75;font-size:13px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;padding:6px 14px;border:1px solid currentColor;opacity:.85}
+  .rule{width:100%;height:1px;background:currentColor;opacity:.25;margin:3vh 0}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;margin-bottom:2.6vh}
+  .display{font-family:var(--serif-en);font-weight:700;font-size:11vw;line-height:.92;letter-spacing:-.025em}
+  .display-zh{font-family:var(--serif-zh);font-weight:700;font-size:7.8vw;line-height:1.04;letter-spacing:-.005em}
+  .h1-zh{font-family:var(--serif-zh);font-weight:700;font-size:4.6vw;line-height:1.12;letter-spacing:-.005em}
+  .h2-zh{font-family:var(--serif-zh);font-weight:600;font-size:3.2vw;line-height:1.2;letter-spacing:0}
+  .h3-zh{font-family:var(--serif-zh);font-weight:500;font-size:1.9vw;line-height:1.35}
+  .body-zh{font-family:var(--sans-zh);font-weight:400;font-size:max(15px,1.22vw);line-height:1.75;opacity:.82;letter-spacing:.01em}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.9vw;line-height:1.4;opacity:.85}
+  .meta{font-family:var(--mono);font-size:max(11px,.88vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+  .big-num{font-family:var(--serif-en);font-weight:800;font-size:10vw;line-height:.85;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .mid-num{font-family:var(--serif-en);font-weight:700;font-size:5.5vw;line-height:.88;letter-spacing:-.02em;font-feature-settings:"tnum"}
+  .ghost{font-family:var(--serif-en);font-weight:900;font-size:34vw;line-height:.8;opacity:.06;letter-spacing:-.04em;position:absolute;font-feature-settings:"tnum"}
+  em{font-style:italic;font-family:var(--serif-en)}
+  .en{font-family:var(--serif-en);font-style:italic;font-weight:500}
+  .col{display:flex;flex-direction:column;gap:2.4vh}
+  .row{display:flex;align-items:center;gap:3vw}
+  .grid-6{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4vw 6vw;flex:1;align-content:center;padding:2vh 0}
+  .grid-9{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3vh 4vw;flex:1;align-content:center}
+  .grid-4{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4vh 6vw;flex:1;align-content:center}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;flex:1;align-content:center}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:4vw;flex:1;align-items:center}
+  .split-55{display:grid;grid-template-columns:55fr 45fr;gap:5vw;flex:1;align-items:stretch}
+  .fill{flex:1}
+  .center{align-items:center;justify-content:center;text-align:center}
+  .bottom-left{position:absolute;left:6vw;bottom:9vh;max-width:50vw}
+  .bottom-right{position:absolute;right:6vw;bottom:9vh;max-width:50vw;text-align:right}
+  .top-right{position:absolute;right:6vw;top:6vh;text-align:right}
+  .stat{display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+  .stat .n{font-family:var(--serif-en);font-weight:800;font-size:8vw;line-height:.88;letter-spacing:-.03em;font-feature-settings:"tnum"}
+  .stat .l{font-family:var(--sans-zh);font-size:max(13px,1.05vw);opacity:.7;margin-top:1vh;font-weight:400;line-height:1.5}
+  .stat .m{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.5;margin-bottom:.2vh}
+  .callout{padding:3vh 2.4vw;border-left:3px solid currentColor;position:relative;font-family:var(--serif-zh);font-size:max(15px,1.2vw);line-height:1.55;opacity:.92}
+  .slide.light .callout{background:rgba(var(--ink-rgb),.05)}
+  .slide.dark .callout{background:rgba(var(--paper-rgb),.06)}
+  .callout .cite{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .ico{width:1em;height:1em;display:inline-block;vertical-align:-.12em;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .ico-lg,.ico-md,.ico-sm{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+  .ico-lg{width:2.6vw;height:2.6vw;stroke-width:1.2;display:inline-block}
+  .ico-md{width:1.8vw;height:1.8vw;stroke-width:1.3;display:inline-block;vertical-align:-.4em}
+  .ico-sm{width:1.1vw;height:1.1vw;stroke-width:1.4;display:inline-block;vertical-align:-.15em;opacity:.7}
+  .frame-img{overflow:hidden;position:relative;background:rgba(0,0,0,.04);box-sizing:border-box;width:100%;border-radius:4px}
+  .slide.dark .frame-img{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12)}
+  .frame-img > img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .frame-img.fit-contain > img{object-fit:contain;object-position:center center}
+  .frame-img.r-16x9{aspect-ratio:16/9;max-height:64vh}
+  .frame-img.r-16x10{aspect-ratio:16/10;max-height:56vh}
+  .frame-img.r-4x3{aspect-ratio:4/3;max-height:56vh}
+  .frame-img.r-3x2{aspect-ratio:3/2;max-height:46vh}
+  .frame-img.r-3x4{aspect-ratio:3/4;max-height:60vh}
+  .frame-img.r-1x1{aspect-ratio:1/1;max-height:50vh}
+  .frame-img.h-16{height:16vh}
+  .frame-img.h-18{height:18vh}
+  .frame-img.h-22{height:22vh}
+  .frame-img.h-26{height:26vh}
+  .frame-img.h-28{height:28vh}
+  #nav{position:fixed;left:50%;bottom:2.6vh;transform:translateX(-50%);z-index:30;display:flex;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #nav .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s ease;border:0;padding:0}
+  #nav .dot:hover{background:rgba(255,255,255,.5);transform:scale(1.15)}
+  #nav .dot.active{background:rgba(255,255,255,.95);width:22px;border-radius:999px}
+  body.light-bg #nav{background:rgba(255,255,255,.25)}
+  body.light-bg #nav .dot{background:rgba(var(--ink-rgb),.25)}
+  body.light-bg #nav .dot.active{background:rgba(var(--ink-rgb),.9)}
+  #hint{position:fixed;bottom:3vh;right:3vw;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;mix-blend-mode:difference;color:#aaa}
+  body.low-power #hint{opacity:.72;color:var(--paper);mix-blend-mode:normal}
+  body.light-bg.low-power #hint{color:var(--ink)}
+  .frame{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .frame.grid-2-7-5,.frame.grid-2-6-6,.frame.grid-2-8-4,.frame.grid-3-3,.frame.grid-6{display:grid}
+  .h-hero{font-family:var(--serif-zh);font-weight:900;font-size:10vw;line-height:.96;letter-spacing:-.02em}
+  .h-xl{font-family:var(--serif-zh);font-weight:700;font-size:6.2vw;line-height:1.08;letter-spacing:-.01em}
+  .h-sub{font-family:var(--serif-zh);font-weight:500;font-size:3.1vw;line-height:1.25;letter-spacing:0;opacity:.7}
+  .h-md{font-family:var(--serif-zh);font-weight:600;font-size:2.3vw;line-height:1.3}
+  .h-hero-en,.h-xl-en{font-family:var(--serif-en);letter-spacing:-.025em}
+  .lead{font-family:var(--serif-zh);font-weight:400;font-size:1.75vw;line-height:1.5;opacity:.86}
+  .meta-row{display:flex;gap:1.2em;align-items:baseline;flex-wrap:wrap;font-family:var(--mono);font-size:max(12px,.92vw);letter-spacing:.16em;text-transform:uppercase;opacity:.6}
+  .stat-card{display:flex;flex-direction:column;gap:.8vh;align-items:flex-start;padding-top:1.6vh;border-top:1px solid currentColor;border-color:rgba(127,127,127,.3)}
+  .stat-card .stat-label{font-family:var(--mono);font-size:max(10px,.78vw);letter-spacing:.24em;text-transform:uppercase;opacity:.55}
+  .stat-card .stat-nb{font-family:var(--serif-en);font-weight:800;font-size:5.8vw;line-height:.9;letter-spacing:-.03em;font-feature-settings:"tnum";margin-top:.4vh}
+  .stat-card .stat-nb .stat-unit{font-family:var(--serif-zh);font-weight:500;font-size:.38em;letter-spacing:0;opacity:.72;margin-left:.14em}
+  .stat-card .stat-note{font-family:var(--sans-zh);font-weight:400;font-size:max(13px,1.05vw);line-height:1.5;opacity:.72;margin-top:.6vh}
+  .grid-4 .stat-card .stat-nb{font-size:5vw}
+  .grid-3 .stat-card .stat-nb{font-size:6.8vw}
+  .pipeline-section{margin-top:4.4vh;padding-top:2.8vh;border-top:1px dashed rgba(127,127,127,.32)}
+  .pipeline-section:first-of-type{border-top:0;padding-top:0;margin-top:3vh}
+  .pipeline-label{font-family:var(--mono);font-size:max(11px,.85vw);letter-spacing:.24em;text-transform:uppercase;opacity:.62;margin-bottom:2.2vh}
+  .pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2vw}
+  .pipeline[data-cols="3"]{grid-template-columns:repeat(3,1fr)}
+  .pipeline[data-cols="4"]{grid-template-columns:repeat(4,1fr)}
+  .step{display:flex;flex-direction:column;gap:.8vh;padding-top:1.4vh;border-top:1px solid currentColor;border-color:rgba(127,127,127,.35)}
+  .step-nb{font-family:var(--serif-en);font-style:italic;font-weight:500;font-size:1.15vw;opacity:.45}
+  .step-title{font-family:var(--sans-zh);font-weight:700;font-size:1.55vw;letter-spacing:.01em;line-height:1.2}
+  .step-desc{font-family:var(--sans-zh);font-weight:400;font-size:max(12px,.95vw);line-height:1.45;opacity:.72}
+  .grid-2-7-5{display:grid;grid-template-columns:7fr 5fr;gap:3vw 4vh;align-items:start}
+  .grid-2-6-6{display:grid;grid-template-columns:1fr 1fr;gap:3vw 4vh;align-items:start}
+  .grid-2-8-4{display:grid;grid-template-columns:8fr 4fr;gap:3vw 4vh;align-items:start}
+  .grid-3-3{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(0,1fr);gap:2.4vh 2vw}
+  figure.frame-img{margin:0;display:flex;flex-direction:column;min-width:0}
+  .img-cap{display:block;margin-top:.8vh;font-family:var(--mono);font-size:max(10px,.8vw);letter-spacing:.22em;text-transform:uppercase;opacity:.6}
+  .callout-src{display:block;margin-top:1.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .chrome{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.2em;text-transform:uppercase;opacity:.62}
+  .foot{font-family:var(--mono);font-size:max(11px,.78vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5}
+  [data-anim]{opacity:1}
+  body.motion-ready [data-anim]{opacity:0}
+  body.motion-ready [data-anim="left"]{transform:translateX(-24px)}
+  body.motion-ready [data-anim="right"]{transform:translateX(24px)}
+  body.motion-ready [data-anim="line"]{opacity:0;transform:translateY(10px)}
+  body.motion-ready [data-animate="pipeline"] [data-anim]{opacity:.15}
+  body.low-power #deck{transition:none!important}
+  body.low-power *,body.low-power *::before,body.low-power *::after{animation:none!important;transition:none!important}
+  body.low-power.motion-ready [data-anim],body.low-power [data-anim]{opacity:1!important;transform:none!important}
+  @keyframes txt-reveal{0%{clip-path:inset(0 100% 0 0)}60%{clip-path:inset(0 0% 0 0)}100%{clip-path:inset(0 0% 0 0)}}
+  @keyframes text-glow{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 24px rgba(var(--paper-rgb),.12),0 0 60px rgba(var(--paper-rgb),.06)}}
+  @keyframes float-up{0%{transform:translateY(0)}50%{transform:translateY(-.6vh)}100%{transform:translateY(0)}}
+  @keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  .tx-reveal{display:inline-block;clip-path:inset(0 100% 0 0);animation:txt-reveal 1.6s cubic-bezier(.77,0,.175,1) 1.2s forwards}
+  .tx-glow{animation:text-glow 3s ease-in-out infinite}
+  .tx-float{animation:float-up 5s ease-in-out infinite}
+  .tx-heartbeat{animation:heartbeat 2s ease-in-out infinite}
+  .slide.hero .h-hero.tx-reveal{animation:txt-reveal 1.8s cubic-bezier(.77,0,.175,1) 1.4s forwards}
+  body.low-power .tx-reveal,body.low-power .tx-glow,body.low-power .tx-float,body.low-power .tx-heartbeat{clip-path:none!important;animation:none!important}
+  @media (max-width:900px){.display{font-size:16vw}.display-zh{font-size:12vw}.h1-zh{font-size:7vw}.h-hero{font-size:14vw}.h-xl{font-size:9vw}.pipeline{grid-template-columns:repeat(2,1fr)}.grid-2-7-5,.grid-2-6-6,.grid-2-8-4{grid-template-columns:1fr}}
+  .card-2col{display:grid;grid-template-columns:1fr 1fr;gap:3vw;flex:1;align-content:center}
+  .card-item{border-top:1px solid currentColor;border-color:rgba(127,127,127,.25);padding-top:2.2vh}
+  .card-item .card-label{font-family:var(--mono);font-size:max(10px,.82vw);letter-spacing:.24em;text-transform:uppercase;opacity:.5;margin-bottom:1vh}
+  .card-item .card-title{font-family:var(--serif-zh);font-weight:700;font-size:1.8vw;line-height:1.2;margin-bottom:1.2vh}
+  .card-item .card-desc{font-family:var(--sans-zh);font-weight:400;font-size:max(13px,1.05vw);line-height:1.6;opacity:.78}
+  .pillar{display:flex;flex-direction:column;gap:1.2vh}
+  .pillar .t{font-family:var(--serif-zh);font-weight:700;font-size:2vw;line-height:1.15}
+  .pillar .d{font-family:var(--sans-zh);font-weight:400;font-size:max(13px,1vw);line-height:1.55;opacity:.78}
+  .rowline{display:grid;grid-template-columns:1fr 2fr;gap:1.5vw;padding:1.6vh 0;border-top:1px solid currentColor;align-items:center;border-color:rgba(127,127,127,.2)}
+  .rowline .k{font-family:var(--serif-zh);font-weight:600;font-size:1.5vw}
+  .rowline .v{font-family:var(--sans-zh);font-weight:400;font-size:max(13px,1vw);opacity:.82;line-height:1.5}
+  .uni-card{padding:2vh 1.5vw;border-top:2px solid currentColor;border-color:rgba(127,127,127,.25)}
+  .uni-card .uni-abbr{font-family:var(--serif-en);font-weight:800;font-size:2.8vw;letter-spacing:-.02em}
+  .uni-card .uni-name{font-family:var(--serif-zh);font-weight:600;font-size:1.3vw;margin-top:.5vh;opacity:.8}
+  .uni-card .uni-tag{font-family:var(--mono);font-size:max(10px,.75vw);letter-spacing:.18em;text-transform:uppercase;opacity:.5;margin-top:.8vh}
+  .pathway-row{display:flex;align-items:center;gap:1.5vw;padding:1.8vh 0;border-bottom:1px solid rgba(127,127,127,.2)}
+  .pathway-row:last-child{border-bottom:none}
+  .pathway-row .flag{font-size:1.8vw;flex-shrink:0;width:3vw;text-align:center}
+  .pathway-row .dest{font-family:var(--serif-zh);font-weight:600;font-size:1.4vw;flex:1}
+  .pathway-row .desc{font-family:var(--sans-zh);font-size:max(12px,.95vw);opacity:.7;text-align:right}
+  .sys-badge{display:inline-flex;align-items:center;gap:.6vw;padding:.8vh 1.2vw;border:1px solid rgba(127,127,127,.3);border-radius:4px;font-family:var(--mono);font-size:max(10px,.8vw);letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+  .slide.dark .sys-badge{border-color:rgba(var(--paper-rgb),.2)}
+  .slide.light .sys-badge{border-color:rgba(var(--ink-rgb),.2)}
+  .course-row{display:flex;align-items:center;gap:1.5vw;padding:1.6vh 0;border-bottom:1px solid rgba(127,127,127,.2)}
+  .course-row:last-child{border-bottom:none}
+  .course-row .course-name{font-family:var(--serif-en);font-weight:600;font-size:1.3vw;flex:1;letter-spacing:-.01em}
+  .course-row .course-dir{font-family:var(--sans-zh);font-size:max(12px,.9vw);opacity:.7;flex:1}
+  .course-row .course-hr{font-family:var(--mono);font-size:max(11px,.85vw);letter-spacing:.1em;text-align:right;opacity:.6}
+  .grade-badge{display:inline-flex;align-items:center;justify-content:center;width:3.2vw;height:3.2vw;border-radius:50%;font-family:var(--serif-en);font-weight:800;font-size:1.6vw;letter-spacing:-.02em}
+  .slide.light .grade-badge{background:var(--ink);color:var(--paper)}
+  .slide.dark .grade-badge{background:var(--paper);color:var(--ink)}
+  .module-tag{display:inline-block;padding:.4vh .8vw;border-radius:3px;font-family:var(--mono);font-size:max(10px,.75vw);letter-spacing:.12em;text-transform:uppercase}
+  .module-tag.english{background:rgba(41,128,185,.15);color:#2980b9}
+  .module-tag.science{background:rgba(45,138,78,.15);color:#2d8a4e}
+  .module-tag.ai{background:rgba(142,68,173,.15);color:#8e44ad}
+  .module-tag.pbl{background:rgba(192,57,43,.15);color:#c0392b}
+  .module-tag.global{background:rgba(230,126,34,.15);color:#e67e22}
+  .module-tag.assessment{background:rgba(127,127,127,.15);color:rgba(127,127,127,.8)}
+</style>
+</head>
+<body>
+<script>
+  (function(){
+    const KEY = 'guizang-ppt-low-power';
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stored = localStorage.getItem(KEY);
+    window.__lowPowerMode = stored === '1' || (stored === null && reduced);
+    function updateHint(){
+      const hint = document.getElementById('hint');
+      if(hint) hint.textContent = '← → 翻页 · B 静态 · ESC 索引';
+    }
+    window.__setLowPowerMode = function(on, opts={}){
+      window.__lowPowerMode = !!on;
+      document.body.classList.toggle('low-power', window.__lowPowerMode);
+      if(opts.persist !== false) localStorage.setItem(KEY, window.__lowPowerMode ? '1' : '0');
+      if(window.__lowPowerMode && document.getAnimations) document.getAnimations().forEach(a=>a.cancel());
+      updateHint();
+      dispatchEvent(new CustomEvent('ppt-low-power-change', {detail:{on:window.__lowPowerMode}}));
+      if(window.__playSlide) window.__playSlide(window.__currentSlideIndex || 0);
+    };
+    document.body.classList.toggle('low-power', window.__lowPowerMode);
+    addEventListener('DOMContentLoaded', updateHint, {once:true});
+  })();
+</script>
+<canvas id="bg-dark" class="bg"></canvas>
+<canvas id="bg-light" class="bg"></canvas>
+<div id="hint">← → 翻页 · B 静态 · ESC 索引</div>
+<div id="deck">
+
+<!-- Slide 1: Cover -->
+<section class="slide hero dark">
+  <div class="chrome"><div>MFA · 课程清单</div><div>01 / 10</div></div>
+  <div class="frame" style="display:grid; gap:4vh; align-content:center; min-height:80vh">
+    <div style="display:flex; align-items:center; gap:1.2vw; margin-bottom:-1vh" data-anim>
+      <img src="images/mfa_logo.jpg" alt="MFA Logo" style="height:10vh; width:auto; object-fit:contain; border-radius:6px; border:2px solid transparent; background-image:linear-gradient(var(--ink),var(--ink)),linear-gradient(135deg,rgba(var(--paper-rgb),.12),rgba(var(--paper-rgb),.45),rgba(var(--paper-rgb),.12)); background-origin:padding-box,border-box; background-clip:padding-box,border-box">
+    </div>
+    <div class="kicker tx-float" data-anim>Curriculum Framework</div>
+    <h1 class="h-hero tx-reveal" style="font-size:6.5vw" data-anim>MFA 课程清单</h1>
+    <h2 class="h-sub tx-glow" data-anim>AI创新中本贯通项目 · Draft v1.x</h2>
+    <p class="lead" style="max-width:55vw" data-anim>
+      国内课程 + MFA课程融合教学模式，构建AI时代能力培养体系。
+    </p>
+    <div class="meta-row" data-anim>
+      <span>Meridian Future Academy</span><span>·</span><span>课程清单白皮书</span>
+    </div>
+  </div>
+  <div class="foot"><div>MFA · AI 创新中本贯通</div><div>— 2026 —</div></div>
+</section>
+
+<!-- Slide 2: 课程体系说明 -->
+<section class="slide light" data-animate="hero">
+  <div class="chrome"><div>体系 · System</div><div>02 / 10</div></div>
+  <div class="frame" style="padding-top:4vh">
+    <div class="kicker tx-float" data-anim>Curriculum System</div>
+    <h2 class="h-xl" style="font-size:4.5vw" data-anim>课程体系说明</h2>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>MFA AI创新中本贯通项目采用"国内课程 + MFA课程"融合教学模式</p>
+
+    <!-- 区域1: 数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(127,127,127,.2); border-bottom:1px solid rgba(127,127,127,.2)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">70-75<span style="font-size:.45em; font-weight:500; opacity:.6">%</span></div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">国内高中课程</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">25-30<span style="font-size:.45em; font-weight:500; opacity:.6">%</span></div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">MFA课程</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">3</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">年级完整体系</div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="gap:2vw; margin-top:2vh">
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> AI时代能力培养</div>
+        <div class="d">AI素养 + 科学思维 + 创新实践</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 国际化素养</div>
+        <div class="d">英语能力 + 全球沟通 + 跨文化理解</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 项目式学习</div>
+        <div class="d">PBL + 毕业项目 + 真实问题解决</div>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2.5vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2d8a4e; flex-shrink:0">主体</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">国内课程体系</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2980b9; flex-shrink:0">补充</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">MFA特色课程</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#c0392b; flex-shrink:0">融合</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">双轨并行发展</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>国内课程主体 · MFA课程补充 · AI赋能</div><div>Curriculum System</div></div>
+</section>
+
+<!-- Slide 3: G10 高一课程 -->
+<section class="slide dark" data-animate="hero">
+  <div class="chrome"><div>G10 · 高一</div><div>03 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>Grade 10 · Foundation Year</div>
+    <div style="display:flex; align-items:center; gap:1.5vw; margin-bottom:1.5vh" data-anim>
+      <div class="grade-badge">10</div>
+      <h2 class="h-xl" style="font-size:4vw" data-anim>G10 高一课程安排</h2>
+    </div>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>基础能力培养年 · 建立AI学习与全球素养基础</p>
+
+    <!-- 区域1: 课程数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(var(--paper-rgb),.15); border-bottom:1px solid rgba(var(--paper-rgb),.15)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">4</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">门核心课程</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">6</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">课时/周</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">G10</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">基础能力年</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5vh" data-anim>
+      <div class="course-row">
+        <span class="module-tag english">English</span>
+        <span class="course-name">English Listening & Speaking</span>
+        <span class="course-dir">英语能力</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag science">Science</span>
+        <span class="course-name">Scientific Literacy</span>
+        <span class="course-dir">科学素养</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag global">Global</span>
+        <span class="course-name">Learning Skills & Global Awareness</span>
+        <span class="course-dir">学习能力与全球素养</span>
+        <span class="course-hr">1课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag ai">AI</span>
+        <span class="course-name">AI Learning Foundations</span>
+        <span class="course-dir">AI学习基础</span>
+        <span class="course-hr">1课时/周</span>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">听+说</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">英语听说能力</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">科学</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">科学思维基础</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">AI</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">AI学习基础</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>英语听说 · 科学素养 · 全球素养 · AI基础</div><div>Grade 10</div></div>
+</section>
+
+<!-- Slide 4: G11 高二课程 -->
+<section class="slide light" data-animate="hero">
+  <div class="chrome"><div>G11 · 高二</div><div>04 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>Grade 11 · Development Year</div>
+    <div style="display:flex; align-items:center; gap:1.5vw; margin-bottom:1.5vh" data-anim>
+      <div class="grade-badge">11</div>
+      <h2 class="h-xl" style="font-size:4vw" data-anim>G11 高二课程安排</h2>
+    </div>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>能力发展年 · 深化AI素养与项目式学习</p>
+
+    <!-- 区域1: 课程数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(127,127,127,.2); border-bottom:1px solid rgba(127,127,127,.2)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">4</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">门核心课程</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">7</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">课时/周</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">G11</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">能力发展年</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5vh" data-anim>
+      <div class="course-row">
+        <span class="module-tag english">English</span>
+        <span class="course-name">English Reading & Writing</span>
+        <span class="course-dir">英语能力</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag ai">AI</span>
+        <span class="course-name">AI Literacy & Innovation</span>
+        <span class="course-dir">AI素养与创新</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag pbl">PBL</span>
+        <span class="course-name">Project-Based Learning</span>
+        <span class="course-dir">项目式学习</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag global">Global</span>
+        <span class="course-name">Global Communication & Collaboration</span>
+        <span class="course-dir">全球沟通与协作</span>
+        <span class="course-hr">1课时/周</span>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2d8a4e; flex-shrink:0">读+写</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">英语读写能力</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2980b9; flex-shrink:0">AI+</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">AI素养与创新</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#c0392b; flex-shrink:0">PBL</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">项目式学习</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>英语读写 · AI素养 · PBL · 全球沟通</div><div>Grade 11</div></div>
+</section>
+
+<!-- Slide 5: G12 高三课程 -->
+<section class="slide dark" data-animate="hero">
+  <div class="chrome"><div>G12 · 高三</div><div>05 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>Grade 12 · Capstone Year</div>
+    <div style="display:flex; align-items:center; gap:1.5vw; margin-bottom:1.5vh" data-anim>
+      <div class="grade-badge">12</div>
+      <h2 class="h-xl" style="font-size:4vw" data-anim>G12 高三课程安排</h2>
+    </div>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>成果展示年 · 毕业项目与升学准备</p>
+
+    <!-- 区域1: 课程数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(var(--paper-rgb),.15); border-bottom:1px solid rgba(var(--paper-rgb),.15)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">4</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">门核心课程</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">6</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">课时/周</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">G12</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">成果展示年</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5vh" data-anim>
+      <div class="course-row">
+        <span class="module-tag pbl">Project</span>
+        <span class="course-name">Graduation Project</span>
+        <span class="course-dir">毕业项目</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag ai">AI</span>
+        <span class="course-name">Applied AI & Innovation</span>
+        <span class="course-dir">AI应用与创新</span>
+        <span class="course-hr">2课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag global">Future</span>
+        <span class="course-name">College & Career Preparation</span>
+        <span class="course-dir">升学与未来规划</span>
+        <span class="course-hr">1课时/周</span>
+      </div>
+      <div class="course-row">
+        <span class="module-tag english">English</span>
+        <span class="course-name">Academic English Support</span>
+        <span class="course-dir">学术英语支持</span>
+        <span class="course-hr">1课时/周</span>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">毕业</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">毕业项目展示</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">AI</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">AI应用实践</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">升学</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">升学与未来规划</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>毕业项目 · AI应用 · 升学规划 · 学术英语</div><div>Grade 12</div></div>
+</section>
+
+<!-- Slide 6: 五大课程模块 -->
+<section class="slide light" data-animate="hero">
+  <div class="chrome"><div>模块 · Modules</div><div>06 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>Five Core Modules</div>
+    <h2 class="h-xl" style="font-size:4.5vw" data-anim>五大课程模块</h2>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>MFA课程体系核心组成部分</p>
+
+    <!-- 区域1: 数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(127,127,127,.2); border-bottom:1px solid rgba(127,127,127,.2)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">5</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">大核心模块</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">3</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">年完整体系</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">1</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">套融合模式</div>
+      </div>
+    </div>
+
+    <div class="grid-3-3" style="gap:1.8vh 2vw; margin-top:1.5vh">
+      <div class="card-item" data-anim>
+        <div class="card-title" style="font-size:1.4vw"> 英语能力课程</div>
+        <div class="card-desc">听说读写 + 学术英语 + 国际沟通</div>
+      </div>
+      <div class="card-item" data-anim>
+        <div class="card-title" style="font-size:1.4vw"> 科学素养</div>
+        <div class="card-desc">科学思维 + 数据分析 + 跨学科理解</div>
+      </div>
+      <div class="card-item" data-anim>
+        <div class="card-title" style="font-size:1.4vw"> AI素养</div>
+        <div class="card-desc">AI基础逻辑 + 工具使用 + AI伦理</div>
+      </div>
+      <div class="card-item" data-anim>
+        <div class="card-title" style="font-size:1.4vw"> PBL项目式学习</div>
+        <div class="card-desc">真实问题解决 + 创新实践 + 团队合作</div>
+      </div>
+      <div class="card-item" data-anim>
+        <div class="card-title" style="font-size:1.4vw"> 毕业项目</div>
+        <div class="card-desc">研究课题 + 创新项目 + Presentation答辩</div>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2d8a4e; flex-shrink:0">English</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">实用+学术英语</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2980b9; flex-shrink:0">AI+</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">AI素养与创新</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#c0392b; flex-shrink:0">PBL</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">项目式学习</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>英语 · 科学 · AI · PBL · 毕业项目</div><div>Five Modules</div></div>
+</section>
+
+<!-- Slide 7: AI赋能学习体系 -->
+<section class="slide dark" data-animate="hero">
+  <div class="chrome"><div>AI赋能 · AI Empowerment</div><div>07 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>AI-Powered Learning System</div>
+    <h2 class="h-xl" style="font-size:4.5vw" data-anim>AI赋能学习体系</h2>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>项目引入AI学习支持体系，全面提升学习效率</p>
+
+    <!-- 区域1: 数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(var(--paper-rgb),.15); border-bottom:1px solid rgba(var(--paper-rgb),.15)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">6</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">项AI支持功能</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">2</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">大学习平台</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">1</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">套完整体系</div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="gap:2vw; margin-top:1.5vh">
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 个性化学习</div>
+        <div class="d">AI学习助手 + 学习画像</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 错题分析</div>
+        <div class="d">智能错题归类 + 针对性练习</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 数据驱动</div>
+        <div class="d">学习行为分析 + 数据反馈</div>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">AI</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">AI学习助手</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">Data</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">学习行为分析</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">LMS</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">学习管理平台</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>个性化 · 错题分析 · 数据驱动 · AI助手</div><div>AI Empowerment</div></div>
+</section>
+
+<!-- Slide 8: 教学实施方式 -->
+<section class="slide light" data-animate="hero">
+  <div class="chrome"><div>实施 · Implementation</div><div>08 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>Teaching Methods</div>
+    <h2 class="h-xl" style="font-size:4.5vw" data-anim>教学实施方式</h2>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>项目采用"线上 + 线下"融合教学模式</p>
+
+    <!-- 区域1: 数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(127,127,127,.2); border-bottom:1px solid rgba(127,127,127,.2)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">5</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">种教学模式</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">2</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">大学习平台</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--ink); font-feature-settings:'tnum'">1</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">套融合体系</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5vh" data-anim>
+      <div class="course-row">
+        <span style="font-size:1.2vw; flex-shrink:0">🏫</span>
+        <span class="course-name">校内课堂</span>
+        <span class="course-dir">国内课程主体教学</span>
+      </div>
+      <div class="course-row">
+        <span style="font-size:1.2vw; flex-shrink:0">💻</span>
+        <span class="course-name">LMS在线学习</span>
+        <span class="course-dir">MFA课程在线学习平台</span>
+      </div>
+      <div class="course-row">
+        <span style="font-size:1.2vw; flex-shrink:0"></span>
+        <span class="course-name">AI学习系统</span>
+        <span class="course-dir">国内课程AI学习支持</span>
+      </div>
+      <div class="course-row">
+        <span style="font-size:1.2vw; flex-shrink:0">🔬</span>
+        <span class="course-name">项目式学习</span>
+        <span class="course-dir">PBL活动与实践</span>
+      </div>
+      <div class="course-row">
+        <span style="font-size:1.2vw; flex-shrink:0"></span>
+        <span class="course-name">Workshop / Seminar</span>
+        <span class="course-dir">国际化活动与交流</span>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2d8a4e; flex-shrink:0">线上</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">LMS + AI系统</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#2980b9; flex-shrink:0">线下</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">校内课堂 + PBL</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--ink-rgb),.03); border-radius:4px; border-left:3px solid rgba(var(--ink-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#c0392b; flex-shrink:0">融合</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">线上线下融合</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>校内课堂 · LMS · AI系统 · PBL · Workshop</div><div>Teaching Methods</div></div>
+</section>
+
+<!-- Slide 9: Assessment 学习评价 -->
+<section class="slide dark" data-animate="hero">
+  <div class="chrome"><div>评价 · Assessment</div><div>09 / 10</div></div>
+  <div class="frame" style="padding-top:3vh">
+    <div class="kicker tx-float" data-anim>Assessment System</div>
+    <h2 class="h-xl" style="font-size:4.5vw" data-anim>Assessment<br>学习评价体系</h2>
+    <p class="lead" style="font-size:1.15vw;margin-bottom:2vh" data-anim>过程性评价 + 项目评价相结合 · 学术能力与综合能力并重</p>
+
+    <!-- 区域1: 数据大字报 -->
+    <div style="display:flex; gap:4vw; margin:2vh 0 2vh 0; padding:2vh 0; border-top:1px solid rgba(var(--paper-rgb),.15); border-bottom:1px solid rgba(var(--paper-rgb),.15)" data-anim>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">6</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">项评价维度</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">2</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">类评价方式</div>
+      </div>
+      <div style="flex:1; text-align:center">
+        <div style="font-family:var(--serif-en); font-weight:800; font-size:3.6vw; line-height:.9; letter-spacing:-.03em; color:var(--paper); font-feature-settings:'tnum'">1</div>
+        <div style="font-family:var(--mono); font-size:.7vw; letter-spacing:.2em; text-transform:uppercase; opacity:.5; margin-top:.8vh">套完整体系</div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="gap:2vw; margin-top:1.5vh">
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 作业 + Quiz</div>
+        <div class="d">日常学习检测 + 知识点巩固</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> 项目任务</div>
+        <div class="d">PBL项目成果 + 实践能力评估</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> Presentation</div>
+        <div class="d">项目展示 + 答辩能力评估</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> Participation</div>
+        <div class="d">课堂参与 + 团队协作评估</div>
+      </div>
+      <div class="pillar" data-anim>
+        <div class="t" style="font-size:1.4vw"> Graduation Project</div>
+        <div class="d">毕业项目综合评估</div>
+      </div>
+    </div>
+
+    <!-- 区域2: 趋势指标 -->
+    <div style="display:flex; gap:2vw; margin:2vh 0 0 0" data-anim>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">过程</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">过程性评价</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">项目</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">项目评价</div>
+      </div>
+      <div style="flex:1; display:flex; align-items:center; gap:1vw; padding:1vh .8vw; background:rgba(var(--paper-rgb),.04); border-radius:4px; border-left:3px solid rgba(var(--paper-rgb),.2)">
+        <div style="font-family:var(--serif-en); font-weight:700; font-size:1.2vw; color:#5dade2; flex-shrink:0">综合</div>
+        <div style="font-size:.75vw; opacity:.7; line-height:1.4">学术+综合能力</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><div>作业 · Quiz · 项目 · Presentation · 参与 · 毕业项目</div><div>Assessment</div></div>
+</section>
+
+<!-- Slide 10: 结尾 -->
+<section class="slide hero dark">
+  <div class="chrome"><div>Final · 结语</div><div>10 / 10</div></div>
+  <div class="frame" style="display:grid; gap:4vh; align-content:center; min-height:80vh; text-align:center">
+    <div style="display:flex; align-items:center; justify-content:center; gap:1.2vw" data-anim>
+      <img src="images/mfa_logo.jpg" alt="MFA Logo" style="height:10vh; width:auto; object-fit:contain; border-radius:6px; border:2px solid transparent; background-image:linear-gradient(var(--ink),var(--ink)),linear-gradient(135deg,rgba(var(--paper-rgb),.12),rgba(var(--paper-rgb),.45),rgba(var(--paper-rgb),.12)); background-origin:padding-box,border-box; background-clip:padding-box,border-box">
+    </div>
+    <h1 class="h-hero tx-reveal" style="font-size:6.5vw" data-anim>MFA AI创新<br>中本贯通项目</h1>
+    <p class="lead tx-glow" style="max-width:55vw; margin-inline:auto" data-anim>
+      AI赋能双轨升学系统 · 课程清单
+    </p>
+    <p style="font-family:var(--serif-zh); font-size:1.4vw; opacity:.7; max-width:50vw; margin-inline:auto" data-anim>
+      国内课程主体 + MFA课程补充 + AI赋能学习 = AI时代中国高中教育的新模式。
+    </p>
+    <div class="meta-row" style="justify-content:center; margin-top:2vh" data-anim>
+      <span>Meridian Future Academy</span><span>·</span><span>课程清单白皮书</span>
+    </div>
+  </div>
+  <div class="foot"><div>MFA · AI 创新中本贯通</div><div>— 2026 —</div></div>
+</section>
+
+</div>
+<div id="nav"></div>
+
+<script>
+const VS='attribute vec2 position;void main(){gl_Position=vec4(position,0.0,1.0);}';
+const FS_DARK=`precision highp float;uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;vec3 palette(float t,vec3 a,vec3 b,vec3 c,vec3 d){return a+b*cos(6.28318*(c*t+d));}void main(){vec2 uv=gl_FragCoord.xy/u_resolution.xy;vec2 p=uv*2.0-1.0;p.x*=u_resolution.x/u_resolution.y;vec2 m=u_mouse*2.0-1.0;m.x*=u_resolution.x/u_resolution.y;float md=length(p-m);float mr=sin(md*15.0-u_time*4.0)*exp(-md*3.0);p+=mr*0.08;vec2 p0=p;for(float i=1.0;i<4.0;i++){p.x+=0.1/i*sin(i*3.0*p.y+u_time*0.4)+0.05;p.y+=0.1/i*cos(i*2.0*p.x+u_time*0.3)-0.05;}float r=length(p);float ang=atan(p.y,p.x);vec3 a=vec3(0.12,0.12,0.13);vec3 b=vec3(0.03,0.04,0.05);vec3 c=vec3(1.0,1.0,1.0);vec3 d=vec3(0.1,0.2,0.4);vec3 col=palette(r*1.5+p0.x*0.5+u_time*0.1,a,b,c,d);float disp=sin(r*25.0-u_time*1.5+ang*2.0)*0.5+0.5;col+=vec3(disp*0.015,disp*0.01,disp*0.02);float hi=pow(sin(p.x*4.0+p.y*3.0+u_time)*0.5+0.5,8.0);col+=hi*0.08;vec3 base=vec3(0.05,0.05,0.06);col=mix(base,col,0.85);gl_FragColor=vec4(col,1.0);}`;
+const FS_LIGHT=`precision highp float;uniform vec2 u_resolution;uniform float u_time;uniform vec2 u_mouse;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);float a=hash(i),b=hash(i+vec2(1,0));float c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));vec2 u=f*f*(3.0-2.0*f);return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;}float fbm(vec2 p){float v=0.0,a=0.5;mat2 m=mat2(0.80,0.60,-0.60,0.80);for(int i=0;i<5;i++){v+=a*noise(p);p=m*p*2.02;a*=0.5;}return v;}void main(){vec2 uv=gl_FragCoord.xy/u_resolution.xy;vec2 p=uv;p.x*=u_resolution.x/u_resolution.y;vec2 m=u_mouse;m.x*=u_resolution.x/u_resolution.y;vec2 md=p-m;float dl=length(md);p+=normalize(md+vec2(0.0001))*exp(-dl*5.0)*0.03;vec2 q=vec2(fbm(p*1.8+u_time*0.07),fbm(p*1.8+vec2(5.2,1.3)+u_time*0.06));vec2 r=vec2(fbm(p*2.0+q*1.3+vec2(1.7,9.2)+u_time*0.05),fbm(p*2.0+q*1.3+vec2(8.3,2.8)+u_time*0.04));float f=fbm(p*2.2+r*1.5);vec3 silverDark=vec3(0.86,0.85,0.84);vec3 paper=vec3(0.955,0.945,0.925);vec3 col=mix(silverDark,paper,f);float ph=r.x*2.2+u_time*0.35;col+=vec3(0.78,0.62,0.92)*sin(ph)*0.055;col+=vec3(0.55,0.72,0.95)*sin(ph*0.8+2.0)*0.05;float hl=smoothstep(0.48,0.92,f);col+=hl*0.06;gl_FragColor=vec4(col,1.0);}`;
+const mouse={x:0.5,y:0.5};
+addEventListener('mousemove',e=>{mouse.x=e.clientX/innerWidth;mouse.y=e.clientY/innerHeight});
+function bootGL(canvasId,fsSrc){const canvas=document.getElementById(canvasId);const gl=canvas.getContext('webgl',{alpha:false,antialias:true});if(!gl)return()=>false;const mk=(t,s)=>{const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh};const prog=gl.createProgram();gl.attachShader(prog,mk(gl.VERTEX_SHADER,VS));gl.attachShader(prog,mk(gl.FRAGMENT_SHADER,fsSrc));gl.linkProgram(prog);gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);const pos=gl.getAttribLocation(prog,'position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);const lRes=gl.getUniformLocation(prog,'u_resolution');const lT=gl.getUniformLocation(prog,'u_time');const lM=gl.getUniformLocation(prog,'u_mouse');const resize=()=>{const d=Math.min(window.devicePixelRatio||1,2);canvas.width=innerWidth*d;canvas.height=innerHeight*d;gl.viewport(0,0,canvas.width,canvas.height)};addEventListener('resize',resize);resize();return(tSec)=>{gl.uniform2f(lRes,canvas.width,canvas.height);gl.uniform1f(lT,tSec);gl.uniform2f(lM,mouse.x,1-mouse.y);gl.drawArrays(gl.TRIANGLES,0,6);return true}}
+let drawDark=null,drawLight=null,glRAF=0,glT0=Date.now();
+function startGL(){if(window.__lowPowerMode||glRAF)return;if(!drawDark)drawDark=bootGL('bg-dark',FS_DARK);if(!drawLight)drawLight=bootGL('bg-light',FS_LIGHT);glT0=Date.now();function loop(){if(window.__lowPowerMode){glRAF=0;return}const t=(Date.now()-glT0)/1000;drawDark(t);drawLight(t);glRAF=requestAnimationFrame(loop)}glRAF=requestAnimationFrame(loop)}
+function stopGL(){if(glRAF)cancelAnimationFrame(glRAF);glRAF=0}
+startGL();addEventListener('ppt-low-power-change',e=>{e.detail.on?stopGL():startGL()});
+const deck=document.getElementById('deck'),slides=deck.querySelectorAll('.slide'),nav=document.getElementById('nav');let idx=0,total=slides.length,lock=false;
+deck.style.width=(total*100)+'vw';
+slides.forEach((s,i)=>{const b=document.createElement('button');b.className='dot';b.dataset.i=i;b.setAttribute('aria-label','Page '+(i+1));b.onclick=()=>go(i);nav.appendChild(b)});
+function go(n){if(lock)return;idx=Math.max(0,Math.min(total-1,n));window.__currentSlideIndex=idx;deck.style.transform='translateX('+(-idx*100)+'vw)';nav.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));const el=slides[idx];const th=el.dataset.theme||(el.classList.contains('light')?'light':'dark');document.body.classList.toggle('light-bg',th==='light');if(window.__playSlide)setTimeout(()=>window.__playSlide(idx),450);lock=true;setTimeout(()=>lock=false,700)}
+let overviewOn=false;const ov=document.createElement('div');ov.id='overview';ov.style.cssText='position:fixed;inset:0;z-index:100;background:rgba(var(--ink-rgb),.92);backdrop-filter:blur(12px);display:none;overflow-y:auto;padding:4vh 4vw';document.body.appendChild(ov);
+function buildOverview(){ov.innerHTML='';const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:2vh 1.6vw;max-width:90vw;margin:0 auto';slides.forEach((s,i)=>{const card=document.createElement('div');card.style.cssText='cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid '+(i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)');card.onmouseenter=()=>card.style.borderColor='rgba(var(--paper-rgb),.6)';card.onmouseleave=()=>card.style.borderColor=i===idx?'rgba(var(--paper-rgb),.8)':'rgba(var(--paper-rgb),.15)';const wrap=document.createElement('div');wrap.style.cssText='width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;pointer-events:none;background:'+(s.classList.contains('light')?'var(--paper)':'var(--ink)');const clone=s.cloneNode(true);clone.style.cssText='width:100vw;height:100vh;transform:scale('+(1/4.5)+');transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none';wrap.appendChild(clone);const label=document.createElement('div');label.style.cssText='padding:6px 10px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);opacity:.7';label.textContent=(i+1)+' / '+total;card.appendChild(wrap);card.appendChild(label);card.onclick=()=>{toggleOverview();go(i)};grid.appendChild(card)});ov.appendChild(grid)}
+function toggleOverview(){overviewOn=!overviewOn;if(overviewOn){buildOverview();ov.style.display='block'}else{ov.style.display='none'}}
+addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggleOverview();return}if(e.key&&e.key.toLowerCase()==='b'&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();window.__setLowPowerMode(!window.__lowPowerMode);return}if(overviewOn)return;if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='ArrowDown'){if(window.__pipeAdvance&&window.__pipeAdvance())return;go(idx+1);return}if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='ArrowUp')go(idx-1);if(e.key==='Home')go(0);if(e.key==='End')go(total-1)});
+let wheelTO=null,wheelAcc=0;addEventListener('wheel',e=>{wheelAcc+=e.deltaY+e.deltaX;if(Math.abs(wheelAcc)>50){if(wheelAcc>0&&window.__pipeAdvance&&window.__pipeAdvance()){wheelAcc=0}else{go(idx+(wheelAcc>0?1:-1));wheelAcc=0}}clearTimeout(wheelTO);wheelTO=setTimeout(()=>wheelAcc=0,150)},{passive:true});
+let tx=0,ty=0;addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0&&window.__pipeAdvance&&window.__pipeAdvance())return;go(idx+(dx<0?1:-1))}},{passive:true});
+go(0);
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+<script type="module">
+let motion;
+try{motion=await import('./assets/motion.min.js')}catch(e1){try{motion=await import('https://cdn.jsdelivr.net/npm/motion@11.11.17/+esm')}catch(e2){console.warn('[motion] failed',e1,e2);document.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'});document.querySelectorAll('[data-animate="pipeline"] [data-anim]').forEach(el=>el.style.opacity='1')}}
+if(motion){const{animate,stagger}=motion;document.body.classList.add('motion-ready');const EASE=[.22,1,.36,1];const slides=[...document.querySelectorAll('.slide')];let pipeStep=-1,lastIdx=-1;function resetAnims(slide){slide.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='';el.style.transform=''})}function revealStatic(slide){resetAnims(slide);document.getAnimations?.().forEach(a=>a.cancel());slide.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='1';el.style.transform='none'})}function playSlide(i){const slide=slides[i];if(!slide)return;lastIdx=i;const recipe=slide.dataset.animate||(slide.classList.contains('hero')?'hero':'cascade');if(window.__lowPowerMode){revealStatic(slide);return}if(recipe==='pipeline'){pipeStep=-1;slide.querySelectorAll('[data-anim]').forEach(el=>{el.style.opacity='0.15';el.style.transform='none'});return}resetAnims(slide);const all=[...slide.querySelectorAll('[data-anim]')];if(!all.length)return;if(recipe==='directional'){const lefts=all.filter(el=>el.dataset.anim==='left'),divs=all.filter(el=>el.dataset.anim==='divider'),rights=all.filter(el=>el.dataset.anim==='right'),others=all.filter(el=>!['left','right','divider'].includes(el.dataset.anim));if(others.length)animate(others,{opacity:[0,1],y:[12,0]},{duration:.6,delay:stagger(.1,{start:.15}),easing:EASE});if(lefts.length)animate(lefts,{opacity:[0,1],x:[-24,0]},{duration:.8,delay:.35,easing:EASE});if(divs.length)animate(divs,{opacity:[0,.25]},{duration:.5,delay:.9});if(rights.length)animate(rights,{opacity:[0,1],x:[24,0]},{duration:.8,delay:1.0,easing:EASE});return}if(recipe==='quote'){const lines=all.filter(el=>el.dataset.anim==='line'),others=all.filter(el=>el.dataset.anim!=='line');if(others.length)animate(others,{opacity:[0,1],y:[8,0]},{duration:.6,delay:stagger(.12,{start:.2}),easing:EASE});if(lines.length)animate(lines,{opacity:[.35,1],y:[10,0]},{duration:.8,delay:stagger(.55,{start:.5}),easing:EASE});return}if(recipe==='hero'){animate(all,{opacity:[0,1],y:[16,0]},{duration:.7,delay:stagger(.12,{start:.2}),easing:EASE});return}animate(all,{opacity:[0,1],y:[12,0]},{duration:.6,delay:stagger(.1,{start:.15}),easing:EASE})}window.__playSlide=playSlide;window.__pipeAdvance=function(){const slide=slides[lastIdx];if(!slide||slide.dataset.animate!=='pipeline')return false;pipeStep++;const steps=[...slide.querySelectorAll('[data-anim]')];if(pipeStep>=steps.length){pipeStep=-1;return false}animate(steps[pipeStep],{opacity:[.15,1],y:[8,0]},{duration:.5,easing:EASE});return true};playSlide(0);const obs=new IntersectionObserver(entries=>{entries.forEach(en=>{if(en.isIntersecting){const i=slides.indexOf(en.target);if(i>=0)playSlide(i)}})},{threshold:.5});slides.forEach(s=>obs.observe(s))}
+</script>
+</body>
+</html>
